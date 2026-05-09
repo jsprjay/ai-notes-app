@@ -1,14 +1,21 @@
 # Python
-venv/
+backend/venv/
 __pycache__/
 *.pyc
 
-# Node
+# SQLite/runtime data
+*.db
+*.sqlite
+*.sqlite3
+
+# Env/secrets
+.env
+.env.*
+
+# Angular/Node
 node_modules/
 dist/
+.angular/
 
 # Mac
 .DS_Store
-
-# Env
-.env
