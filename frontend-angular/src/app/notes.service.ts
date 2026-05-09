@@ -30,4 +30,8 @@ export class NotesService {
   updateNote(id: number, title: string): Observable<Note> {
     return this.http.put<Note>(`${this.apiUrl}/${id}`, { title });
   }
+
+  getSummary(): Observable<{ summary: string }> {
+    return this.http.get<{ summary: string }>('http://127.0.0.1:8000/notes/summary');
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NotesService, Note } from './notes.service';
 import { CommonModule } from '@angular/common';
@@ -22,7 +22,13 @@ export class App implements OnInit {
   isSaving = false;
   isDeletingId: number | null = null;
 
-  constructor(private notesService: NotesService) {}
+  summary = '';
+  isSummarizing = false;
+
+  constructor(
+    private notesService: NotesService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadNotes();
@@ -115,6 +121,26 @@ export class App implements OnInit {
       error: () => {
         this.error = 'Could not update note. Please try again.';
         this.isSaving = false;
+      }
+    });
+  }
+
+  getSummary(): void {
+    this.isSummarizing = true;
+    this.error = '';
+
+    this.notesService.getSummary().subscribe({
+      next: (res) => {
+        this.summary = res.summary;
+        this.isSummarizing = false;
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Could not generate summary.';
+        this.isSummarizing = false;
+
+        this.cdr.detectChanges();
       }
     });
   }

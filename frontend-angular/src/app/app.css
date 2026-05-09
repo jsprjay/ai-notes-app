@@ -87,3 +87,10 @@ input:disabled {
   padding: 10px;
   border-radius: 8px;
 }
+
+.summary-box {
+  margin-top: 20px;
+  padding: 16px;
+  background: #eef6ff;
+  border-radius: 10px;
+}
