@@ -15,8 +15,21 @@
 
   <ul>
     <li *ngFor="let note of notes">
-      <span>{{ note.title }}</span>
-      <button class="delete-btn" (click)="deleteNote(note.id)">Delete</button>
+      <ng-container *ngIf="editingNoteId === note.id; else viewMode">
+        <input [(ngModel)]="editedTitle" />
+
+        <button (click)="saveEdit(note.id)">Save</button>
+        <button (click)="cancelEditing()">Cancel</button>
+      </ng-container>
+
+      <ng-template #viewMode>
+        <span>{{ note.title }}</span>
+
+        <div>
+          <button (click)="startEditing(note)">Edit</button>
+          <button class="delete-btn" (click)="deleteNote(note.id)">Delete</button>
+        </div>
+      </ng-template>
     </li>
   </ul>
 </div>

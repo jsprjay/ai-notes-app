@@ -15,6 +15,9 @@ export class App implements OnInit {
   noteTitle = '';
   error = '';
 
+  editingNoteId: number | null = null;
+  editedTitle = '';
+
   constructor(private notesService: NotesService) {}
 
   ngOnInit(): void {
@@ -62,4 +65,35 @@ export class App implements OnInit {
       }
     });
   }
+
+  startEditing(note: Note): void {
+  this.editingNoteId = note.id;
+  this.editedTitle = note.title;
+}
+
+cancelEditing(): void {
+  this.editingNoteId = null;
+  this.editedTitle = '';
+}
+
+saveEdit(id: number): void {
+  const title = this.editedTitle.trim();
+
+  if (!title) {
+    this.error = 'Note cannot be empty.';
+    return;
+  }
+
+  this.notesService.updateNote(id, title).subscribe({
+    next: () => {
+      this.editingNoteId = null;
+      this.editedTitle = '';
+      this.error = '';
+      this.loadNotes();
+    },
+    error: () => {
+      this.error = 'Could not update note.';
+    }
+  });
+}
 }

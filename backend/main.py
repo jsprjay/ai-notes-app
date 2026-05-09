@@ -74,3 +74,16 @@ def delete_note(note_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Note deleted"}
+
+@app.put("/notes/{note_id}")
+def update_note(note_id: int, updated_note: dict, db: Session = Depends(get_db)):
+    note = db.query(Note).filter(Note.id == note_id).first()
+
+    if note is None:
+        return {"message": "Note not found"}
+
+    note.title = updated_note["title"]
+    db.commit()
+    db.refresh(note)
+
+    return note
