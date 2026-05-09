@@ -23,13 +23,29 @@ A full-stack notes application built with Angular, FastAPI, SQLAlchemy, and SQLi
 
 ## ✨ Features
 
-* Create, view, edit, and delete notes
-* Persistent data storage using SQLite
-* RESTful API integration between frontend and backend
-* Loading states for better user feedback
-* Inline error handling for failed requests
-* Disabled buttons during API calls to prevent duplicate actions
-* Empty state messaging when no notes exist
+- Create, view, edit, and delete notes
+- Persistent data storage using SQLite
+- RESTful API integration between frontend and backend
+- AI-powered note summarization (with mock fallback)
+- Loading states for better user feedback
+- Inline error handling for failed requests
+- Disabled buttons during API calls to prevent duplicate actions
+- Empty state messaging when no notes exist
+
+---
+
+## 🤖 AI Integration
+
+The application includes an AI-powered summarization feature that generates insights from user-created notes.
+
+- Implemented using an API-based architecture
+- Includes a mock fallback to enable development without external dependencies
+- Designed to be easily extended for real AI integrations
+
+Example use cases:
+- Summarizing tasks
+- Extracting key topics
+- Improving productivity insights
 
 ---
 
@@ -111,11 +127,12 @@ http://localhost:4200
 
 ## 🧠 What I Learned
 
-* How frontend and backend communicate via REST APIs
-* How to structure a full-stack application
-* How to persist data using a database
-* How to build responsive UI with loading and error states
-* How to manage state and API calls in Angular
+- How frontend and backend communicate via REST APIs
+- How to structure a full-stack application
+- How to persist data using a database
+- How to integrate AI features into an existing application
+- How to design fallback mechanisms for external APIs
+- How to improve user experience with loading states and error handling
 
 ---
 
