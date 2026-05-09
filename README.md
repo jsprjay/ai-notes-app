@@ -1,14 +1,128 @@
-# AI Notes App
+# Full-Stack Notes App
 
-Full-stack notes application built with:
+A full-stack notes application built with Angular, FastAPI, SQLAlchemy, and SQLite. The app allows users to create, view, edit, and delete notes with persistent storage and a responsive user experience.
 
-- Angular (frontend)
-- FastAPI (backend)
-- SQLite (database)
+---
 
-## Features
-- Create notes
-- Read notes
-- Update notes
-- Delete notes
-- Persistent storage
+## 🚀 Tech Stack
+
+### Frontend
+
+* Angular
+* TypeScript
+* HTML/CSS
+
+### Backend
+
+* Python
+* FastAPI
+* SQLAlchemy
+* SQLite
+
+---
+
+## ✨ Features
+
+* Create, view, edit, and delete notes
+* Persistent data storage using SQLite
+* RESTful API integration between frontend and backend
+* Loading states for better user feedback
+* Inline error handling for failed requests
+* Disabled buttons during API calls to prevent duplicate actions
+* Empty state messaging when no notes exist
+
+---
+
+## 🏗️ Architecture
+
+```text
+Angular Frontend
+   ↓ HTTP Requests
+FastAPI Backend
+   ↓ SQLAlchemy ORM
+SQLite Database
+```
+
+---
+
+## 📁 Project Structure
+
+```text
+ai-notes-app/
+├── backend/
+├── frontend-angular/
+├── .gitignore
+└── README.md
+```
+
+---
+
+## ▶️ Running Locally
+
+### Backend
+
+```bash
+cd backend
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+Runs at:
+
+```
+http://127.0.0.1:8000
+```
+
+API Docs:
+
+```
+http://127.0.0.1:8000/docs
+```
+
+---
+
+### Frontend
+
+```bash
+cd frontend-angular
+npm install
+npx ng serve --open
+```
+
+Runs at:
+
+```
+http://localhost:4200
+```
+
+---
+
+## 🔌 API Endpoints
+
+| Method | Endpoint         | Description   |
+| ------ | ---------------- | ------------- |
+| GET    | /notes           | Get all notes |
+| POST   | /notes           | Create a note |
+| PUT    | /notes/{note_id} | Update a note |
+| DELETE | /notes/{note_id} | Delete a note |
+
+---
+
+## 🧠 What I Learned
+
+* How frontend and backend communicate via REST APIs
+* How to structure a full-stack application
+* How to persist data using a database
+* How to build responsive UI with loading and error states
+* How to manage state and API calls in Angular
+
+---
+
+## 🚧 Future Improvements
+
+* Add authentication (login/signup)
+* Add search and filtering
+* Add note categories/tags
+* Add AI-powered note summarization
+* Deploy application to the cloud
