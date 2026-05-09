@@ -18,6 +18,10 @@ export class App implements OnInit {
   editingNoteId: number | null = null;
   editedTitle = '';
 
+  isLoading = false;
+  isSaving = false;
+  isDeletingId: number | null = null;
+
   constructor(private notesService: NotesService) {}
 
   ngOnInit(): void {
@@ -25,12 +29,17 @@ export class App implements OnInit {
   }
 
   loadNotes(): void {
+    this.isLoading = true;
+    this.error = '';
+
     this.notesService.getNotes().subscribe({
       next: (data) => {
         this.notes = data;
+        this.isLoading = false;
       },
       error: () => {
-        this.error = 'Could not load notes.';
+        this.error = 'Could not load notes. Please check if the backend is running.';
+        this.isLoading = false;
       }
     });
   }
@@ -43,57 +52,70 @@ export class App implements OnInit {
       return;
     }
 
+    this.isSaving = true;
+    this.error = '';
+
     this.notesService.addNote(title).subscribe({
       next: () => {
         this.noteTitle = '';
-        this.error = '';
+        this.isSaving = false;
         this.loadNotes();
       },
       error: () => {
-        this.error = 'Could not add note.';
+        this.error = 'Could not add note. Please try again.';
+        this.isSaving = false;
       }
     });
   }
 
   deleteNote(id: number): void {
+    this.isDeletingId = id;
+    this.error = '';
+
     this.notesService.deleteNote(id).subscribe({
       next: () => {
+        this.isDeletingId = null;
         this.loadNotes();
       },
       error: () => {
-        this.error = 'Could not delete note.';
+        this.error = 'Could not delete note. Please try again.';
+        this.isDeletingId = null;
       }
     });
   }
 
   startEditing(note: Note): void {
-  this.editingNoteId = note.id;
-  this.editedTitle = note.title;
-}
-
-cancelEditing(): void {
-  this.editingNoteId = null;
-  this.editedTitle = '';
-}
-
-saveEdit(id: number): void {
-  const title = this.editedTitle.trim();
-
-  if (!title) {
-    this.error = 'Note cannot be empty.';
-    return;
+    this.editingNoteId = note.id;
+    this.editedTitle = note.title;
   }
 
-  this.notesService.updateNote(id, title).subscribe({
-    next: () => {
-      this.editingNoteId = null;
-      this.editedTitle = '';
-      this.error = '';
-      this.loadNotes();
-    },
-    error: () => {
-      this.error = 'Could not update note.';
+  cancelEditing(): void {
+    this.editingNoteId = null;
+    this.editedTitle = '';
+  }
+
+  saveEdit(id: number): void {
+    const title = this.editedTitle.trim();
+
+    if (!title) {
+      this.error = 'Note cannot be empty.';
+      return;
     }
-  });
-}
+
+    this.isSaving = true;
+    this.error = '';
+
+    this.notesService.updateNote(id, title).subscribe({
+      next: () => {
+        this.editingNoteId = null;
+        this.editedTitle = '';
+        this.isSaving = false;
+        this.loadNotes();
+      },
+      error: () => {
+        this.error = 'Could not update note. Please try again.';
+        this.isSaving = false;
+      }
+    });
+  }
 }

@@ -26,8 +26,17 @@
         <span>{{ note.title }}</span>
 
         <div>
-          <button (click)="startEditing(note)">Edit</button>
-          <button class="delete-btn" (click)="deleteNote(note.id)">Delete</button>
+          <button (click)="startEditing(note)" [disabled]="isDeletingId === note.id">
+            Edit
+          </button>
+
+          <button
+            class="delete-btn"
+            (click)="deleteNote(note.id)"
+            [disabled]="isDeletingId === note.id"
+          >
+            {{ isDeletingId === note.id ? 'Deleting...' : 'Delete' }}
+          </button>
         </div>
       </ng-template>
     </li>

@@ -61,3 +61,29 @@ li div {
 li input {
   flex: 1;
 }
+
+button:disabled,
+input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading {
+  color: #555;
+  margin-top: 16px;
+}
+
+.empty-state {
+  background: #f3f3f3;
+  padding: 16px;
+  border-radius: 8px;
+  color: #555;
+  margin-top: 16px;
+}
+
+.error {
+  background: #ffeaea;
+  color: #9b1c1c;
+  padding: 10px;
+  border-radius: 8px;
+}
