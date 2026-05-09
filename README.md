@@ -8,5 +8,7 @@ Full-stack notes application built with:
 
 ## Features
 - Create notes
+- Read notes
+- Update notes
 - Delete notes
 - Persistent storage
