@@ -19,3 +19,6 @@ dist/
 
 # Mac
 .DS_Store
+
+# TypeScript build cache
+*.tsbuildinfo
