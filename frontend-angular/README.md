@@ -1,6 +1,6 @@
 # Frontend (Angular)
 
-This is the Angular frontend for the Full-Stack Notes App.
+This is the Angular frontend for the Full-Stack Notes App. The frontend provides authentication, note management, AI summarization interaction, and responsive user experience features.
 
 ---
 
@@ -8,20 +8,24 @@ This is the Angular frontend for the Full-Stack Notes App.
 
 * Angular
 * TypeScript
-* CSS
+* HTML/CSS
 * Angular HttpClient
+* RxJS
 
 ---
 
 ## ✨ Features
 
-* View notes
-* Add notes
-* Edit notes
-* Delete notes
-* Loading states for better UX
-* Error handling for API failures
-* Empty-state messaging
+- User login and registration
+- JWT authentication handling
+- Protected note access
+- Create, edit, and delete notes
+- AI-powered note summarization requests
+- Loading states during API calls
+- Inline error handling
+- Disabled buttons during async operations
+- Empty-state messaging
+- Responsive frontend architecture
 
 ---
 
@@ -40,18 +44,65 @@ http://localhost:4200
 
 ---
 
-## 🔗 API Integration
+## 🔗 Backend Integration
 
-The frontend communicates with the FastAPI backend:
+The frontend communicates with the FastAPI backend using REST APIs.
 
+### Backend URL
+
+```text
+http://127.0.0.1:8000
 ```
-http://127.0.0.1:8000/notes
+
+### Authentication
+
+The frontend stores JWT tokens in local storage and sends them through the Authorization header for protected requests.
+
+```text
+Authorization: Bearer <token>
+```
+
+---
+
+## 🧠 AI Summarization Flow
+
+```text
+Angular Frontend
+      ↓
+Button Click
+      ↓
+HTTP Request to Backend
+      ↓
+Mock AI Summary Returned
+      ↓
+UI Updated with Loading States
+```
+
+The frontend uses Angular services and RxJS observables to manage asynchronous requests and UI updates.
+
+---
+
+## 📁 Frontend Structure
+
+```text
+frontend-angular/
+├── src/
+│   ├── app/
+│   ├── assets/
+│   └── styles.css
+│
+├── package.json
+├── angular.json
+└── tsconfig.json
 ```
 
 ---
 
 ## 🧠 Notes
 
-* Uses Angular services for API calls
-* Uses two-way binding for form input
+* Uses Angular services for API communication
+* Uses two-way binding with `ngModel`
+* Uses observables for async data handling
 * Separates UI logic from API logic
+* Includes loading and error states for improved UX
+* Supports authenticated requests using JWT tokens
