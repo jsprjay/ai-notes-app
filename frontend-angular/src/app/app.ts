@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NotesService, Note } from './notes.service';
 import { CommonModule } from '@angular/common';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-root',
@@ -25,13 +26,64 @@ export class App implements OnInit {
   summary = '';
   isSummarizing = false;
 
+  email = '';
+  password = '';
+  isLoginMode = true;
+  authError = '';
+
   constructor(
     private notesService: NotesService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.loadNotes();
+    if (this.isLoggedIn) {
+      this.loadNotes();
+    }
+  }
+
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
+
+  handleAuth(): void {
+    this.authError = '';
+
+    if (!this.email.trim() || !this.password.trim()) {
+      this.authError = 'Email and password are required.';
+      return;
+    }
+
+    if (this.isLoginMode) {
+      this.authService.login(this.email, this.password).subscribe({
+        next: (res) => {
+          this.authService.saveToken(res.access_token);
+          this.email = '';
+          this.password = '';
+          this.loadNotes();
+        },
+        error: () => {
+          this.authError = 'Invalid email or password.';
+        }
+      });
+    } else {
+      this.authService.register(this.email, this.password).subscribe({
+        next: () => {
+          this.isLoginMode = true;
+          this.authError = 'Account created. You can now log in.';
+        },
+        error: () => {
+          this.authError = 'Could not create account.';
+        }
+      });
+    }
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.notes = [];
+    this.summary = '';
   }
 
   loadNotes(): void {

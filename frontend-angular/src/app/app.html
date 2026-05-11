@@ -1,54 +1,74 @@
 <div class="container">
   <h1>Notes App</h1>
 
-  <div class="form-row">
-    <input
-      [(ngModel)]="noteTitle"
-      placeholder="Enter note"
-      (keyup.enter)="addNote()"
-    />
+  <div *ngIf="!isLoggedIn" class="auth-card">
+    <h2>{{ isLoginMode ? 'Login' : 'Create Account' }}</h2>
 
-    <button (click)="addNote()">Add Note</button>
+    <input [(ngModel)]="email" placeholder="Email" />
+    <input [(ngModel)]="password" placeholder="Password" type="password" />
+
+    <button (click)="handleAuth()">
+      {{ isLoginMode ? 'Login' : 'Register' }}
+    </button>
+
+    <p class="error" *ngIf="authError">{{ authError }}</p>
+
+    <button class="link-btn" (click)="isLoginMode = !isLoginMode">
+      {{ isLoginMode ? 'Need an account? Register' : 'Already have an account? Login' }}
+    </button>
   </div>
 
-  <p class="error" *ngIf="error">{{ error }}</p>
+  <div *ngIf="isLoggedIn">
+    <button (click)="logout()">Logout</button>
+    
+    <div class="form-row">
+      <input
+        [(ngModel)]="noteTitle"
+        placeholder="Enter note"
+        (keyup.enter)="addNote()"
+      />
 
-  <ul>
-    <li *ngFor="let note of notes">
-      <ng-container *ngIf="editingNoteId === note.id; else viewMode">
-        <input [(ngModel)]="editedTitle" />
+      <button (click)="addNote()">Add Note</button>
+    </div>
 
-        <button (click)="saveEdit(note.id)">Save</button>
-        <button (click)="cancelEditing()">Cancel</button>
-      </ng-container>
+    <p class="error" *ngIf="error">{{ error }}</p>
 
-      <ng-template #viewMode>
-        <span>{{ note.title }}</span>
+    <ul>
+      <li *ngFor="let note of notes">
+        <ng-container *ngIf="editingNoteId === note.id; else viewMode">
+          <input [(ngModel)]="editedTitle" />
 
-        <div>
-          <button (click)="startEditing(note)" [disabled]="isDeletingId === note.id">
-            Edit
-          </button>
+          <button (click)="saveEdit(note.id)">Save</button>
+          <button (click)="cancelEditing()">Cancel</button>
+        </ng-container>
 
-          <button
-            class="delete-btn"
-            (click)="deleteNote(note.id)"
-            [disabled]="isDeletingId === note.id"
-          >
-            {{ isDeletingId === note.id ? 'Deleting...' : 'Delete' }}
-          </button>
-        </div>
-      </ng-template>
-    </li>
-  </ul>
+        <ng-template #viewMode>
+          <span>{{ note.title }}</span>
 
-  <button (click)="getSummary()" [disabled]="isSummarizing">
-    {{ isSummarizing ? 'Summarizing...' : 'Summarize Notes' }}
-  </button>
+          <div>
+            <button (click)="startEditing(note)" [disabled]="isDeletingId === note.id">
+              Edit
+            </button>
 
-  <div *ngIf="summary" class="summary-box">
-    <h3>AI Summary</h3>
-    <p>{{ summary }}</p>
+            <button
+              class="delete-btn"
+              (click)="deleteNote(note.id)"
+              [disabled]="isDeletingId === note.id"
+            >
+              {{ isDeletingId === note.id ? 'Deleting...' : 'Delete' }}
+            </button>
+          </div>
+        </ng-template>
+      </li>
+    </ul>
+
+    <button (click)="getSummary()" [disabled]="isSummarizing">
+      {{ isSummarizing ? 'Summarizing...' : 'Summarize Notes' }}
+    </button>
+
+    <div *ngIf="summary" class="summary-box">
+      <h3>AI Summary</h3>
+      <p>{{ summary }}</p>
+    </div>
   </div>
-
 </div>
