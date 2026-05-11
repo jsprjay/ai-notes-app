@@ -1,6 +1,6 @@
 # Full-Stack Notes App
 
-A full-stack notes application built with Angular, FastAPI, SQLAlchemy, and SQLite. The app allows users to create, view, edit, and delete notes with persistent storage and a responsive user experience.
+A full-stack productivity application built with Angular, FastAPI, SQLAlchemy, and SQLite. The app allows authenticated users to create, view, edit, delete, and summarize notes with persistent storage, protected API routes, and responsive UX-focused interactions.
 
 ---
 
@@ -23,14 +23,17 @@ A full-stack notes application built with Angular, FastAPI, SQLAlchemy, and SQLi
 
 ## ✨ Features
 
-- Create, view, edit, and delete notes
+- User authentication with login and registration
+- Protected API routes using JWT authentication
+- Create, view, edit, and delete personal notes
 - Persistent data storage using SQLite
-- RESTful API integration between frontend and backend
+- RESTful API integration between Angular and FastAPI
 - AI-powered note summarization (with mock fallback)
 - Loading states for better user feedback
 - Inline error handling for failed requests
 - Disabled buttons during API calls to prevent duplicate actions
 - Empty state messaging when no notes exist
+- User-specific note isolation and protected data access
 
 ---
 
@@ -41,6 +44,7 @@ The application includes an AI-powered summarization feature that generates insi
 - Implemented using an API-based architecture
 - Includes a mock fallback to enable development without external dependencies
 - Designed to be easily extended for real AI integrations
+- Includes asynchronous loading states and frontend integration through Angular services
 
 Example use cases:
 - Summarizing tasks
@@ -66,7 +70,15 @@ SQLite Database
 ```text
 ai-notes-app/
 ├── backend/
+│   ├── main.py
+│   ├── requirements.txt
+│   └── notes.db
+│
 ├── frontend-angular/
+│   ├── src/
+│   ├── package.json
+│   └── angular.json
+│
 ├── .gitignore
 └── README.md
 ```
@@ -116,30 +128,53 @@ http://localhost:4200
 
 ## 🔌 API Endpoints
 
-| Method | Endpoint         | Description   |
-| ------ | ---------------- | ------------- |
-| GET    | /notes           | Get all notes |
-| POST   | /notes           | Create a note |
-| PUT    | /notes/{note_id} | Update a note |
-| DELETE | /notes/{note_id} | Delete a note |
+| Method | Endpoint              | Description |
+| ------ | --------------------- | ----------- |
+| POST   | /auth/register        | Register user |
+| POST   | /auth/login           | Login user |
+| GET    | /notes                | Get authenticated user's notes |
+| POST   | /notes                | Create a note |
+| PUT    | /notes/{note_id}      | Update a note |
+| DELETE | /notes/{note_id}      | Delete a note |
+| GET    | /notes/summary        | Generate AI summary |
 
 ---
 
 ## 🧠 What I Learned
 
-- How frontend and backend communicate via REST APIs
-- How to structure a full-stack application
-- How to persist data using a database
-- How to integrate AI features into an existing application
-- How to design fallback mechanisms for external APIs
-- How to improve user experience with loading states and error handling
+- How frontend and backend communicate securely via REST APIs
+- How JWT authentication and protected routes work
+- How to structure a full-stack Angular + FastAPI application
+- How to persist relational data using SQLAlchemy and SQLite
+- How to integrate AI-powered features into an existing application
+- How to design mock fallbacks for external APIs
+- How to improve UX with loading states, inline errors, and disabled actions
+- How to manage authentication state and authorization headers in Angular
 
 ---
 
 ## 🚧 Future Improvements
 
-* Add authentication (login/signup)
+* Add note categories and tagging
 * Add search and filtering
-* Add note categories/tags
-* Add AI-powered note summarization
-* Deploy application to the cloud
+* Add real OpenAI-powered summarization
+* Add collaborative/shared notes
+* Add cloud database support (PostgreSQL)
+* Deploy frontend and backend to production
+* Add unit and integration testing
+
+---
+
+## 🔐 Authentication Flow
+
+```text
+Angular Frontend
+   ↓ Login/Register Request
+FastAPI Backend
+   ↓ Password Hashing + JWT Creation
+JWT Token Returned
+   ↓ Stored in Local Storage
+Authenticated Requests Sent with Authorization Header
+
+The application uses JWT-based authentication to protect note-related endpoints and ensure users can only access their own data.
+```
