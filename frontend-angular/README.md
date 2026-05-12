@@ -26,6 +26,9 @@ This is the Angular frontend for the Full-Stack Notes App. The frontend provides
 - Disabled buttons during async operations
 - Empty-state messaging
 - Responsive frontend architecture
+- Search notes by title
+- Sort notes by newest, oldest, A-Z, and Z-A
+- Client-side filtering using Angular state and derived data
 
 ---
 
@@ -106,3 +109,19 @@ frontend-angular/
 * Separates UI logic from API logic
 * Includes loading and error states for improved UX
 * Supports authenticated requests using JWT tokens
+
+---
+
+## 🔎 Search and Filtering
+
+The frontend includes client-side search and sorting functionality.
+
+Users can:
+
+- Search notes by title
+- Sort notes by newest first
+- Sort notes by oldest first
+- Sort alphabetically A-Z
+- Sort alphabetically Z-A
+
+This feature is handled in Angular using component state and a filtered notes getter, allowing the UI to update dynamically without requiring additional backend requests.

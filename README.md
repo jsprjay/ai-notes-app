@@ -34,6 +34,8 @@ A full-stack productivity application built with Angular, FastAPI, SQLAlchemy, a
 - Disabled buttons during API calls to prevent duplicate actions
 - Empty state messaging when no notes exist
 - User-specific note isolation and protected data access
+- Search and filter notes by title
+- Sort notes by newest, oldest, A-Z, and Z-A
 
 ---
 
@@ -150,13 +152,14 @@ http://localhost:4200
 - How to design mock fallbacks for external APIs
 - How to improve UX with loading states, inline errors, and disabled actions
 - How to manage authentication state and authorization headers in Angular
+- How to implement client-side search and sorting in Angular
+- How to manage derived UI state from API data
 
 ---
 
 ## 🚧 Future Improvements
 
 * Add note categories and tagging
-* Add search and filtering
 * Add real OpenAI-powered summarization
 * Add collaborative/shared notes
 * Add cloud database support (PostgreSQL)
@@ -178,3 +181,18 @@ Authenticated Requests Sent with Authorization Header
 
 The application uses JWT-based authentication to protect note-related endpoints and ensure users can only access their own data.
 ```
+
+---
+
+## 🔎 Search and Filtering
+
+The application includes a frontend search and filtering feature that improves note organization and usability.
+
+Users can search notes by title and sort their notes by:
+
+- Newest
+- Oldest
+- A-Z
+- Z-A
+
+This feature demonstrates client-side state management, dynamic rendering, and UX-focused filtering without requiring additional backend API calls.
