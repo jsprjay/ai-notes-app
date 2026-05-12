@@ -31,6 +31,9 @@ export class App implements OnInit {
   isLoginMode = true;
   authError = '';
 
+  searchTerm = '';
+  sortOption = 'newest';
+
   constructor(
     private notesService: NotesService,
     private cdr: ChangeDetectorRef,
@@ -45,6 +48,30 @@ export class App implements OnInit {
 
   get isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
+  }
+
+  get filteredNotes(): Note[] {
+    let filtered = this.notes.filter(note =>
+      note.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+
+    if (this.sortOption === 'az') {
+      filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
+    }
+
+    if (this.sortOption === 'za') {
+      filtered = filtered.sort((a, b) => b.title.localeCompare(a.title));
+    }
+
+    if (this.sortOption === 'newest') {
+      filtered = filtered.sort((a, b) => b.id - a.id);
+    }
+
+    if (this.sortOption === 'oldest') {
+      filtered = filtered.sort((a, b) => a.id - b.id);
+    }
+
+    return filtered;
   }
 
   handleAuth(): void {

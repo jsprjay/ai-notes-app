@@ -19,7 +19,6 @@
   </div>
 
   <div *ngIf="isLoggedIn">
-    <button (click)="logout()">Logout</button>
     
     <div class="form-row">
       <input
@@ -33,8 +32,26 @@
 
     <p class="error" *ngIf="error">{{ error }}</p>
 
+    <p class="empty-state" *ngIf="!isLoading && filteredNotes.length === 0">
+      No notes match your search.
+    </p>
+
+    <div class="filter-row">
+      <input
+        [(ngModel)]="searchTerm"
+        placeholder="Search notes..."
+      />
+
+      <select [(ngModel)]="sortOption">
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="az">A-Z</option>
+        <option value="za">Z-A</option>
+      </select>
+    </div>
+
     <ul>
-      <li *ngFor="let note of notes">
+      <li *ngFor="let note of filteredNotes">
         <ng-container *ngIf="editingNoteId === note.id; else viewMode">
           <input [(ngModel)]="editedTitle" />
 
@@ -65,6 +82,8 @@
     <button (click)="getSummary()" [disabled]="isSummarizing">
       {{ isSummarizing ? 'Summarizing...' : 'Summarize Notes' }}
     </button>
+
+    <button (click)="logout()">Logout</button>
 
     <div *ngIf="summary" class="summary-box">
       <h3>AI Summary</h3>

@@ -94,3 +94,18 @@ input:disabled {
   background: #eef6ff;
   border-radius: 10px;
 }
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.filter-row input {
+  flex: 1;
+}
+
+.filter-row select {
+  padding: 10px;
+  font-size: 16px;
+}
