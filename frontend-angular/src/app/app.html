@@ -79,15 +79,30 @@
       </li>
     </ul>
 
-    <button (click)="getSummary()" [disabled]="isSummarizing">
-      {{ isSummarizing ? 'Summarizing...' : 'Summarize Notes' }}
-    </button>
+    <div class="summary-section">
+      <button
+        class="summary-btn"
+        (click)="getSummary()"
+        [disabled]="isSummarizing"
+      >
+        {{ isSummarizing ? 'Generating summary...' : 'Summarize Notes' }}
+      </button>
 
+      <div *ngIf="isSummarizing" class="summary-loading">
+        <div class="spinner"></div>
+        <span>Ollama is thinking...</span>
+      </div>
+
+      <div *ngIf="summary && !isSummarizing" class="summary-card">
+        <div class="summary-header">
+          <h3>AI Summary</h3>
+          <span class="summary-badge">Ollama</span>
+        </div>
+
+        <p class="summary-text">{{ summary }}</p>
+      </div>
+    </div>
     <button (click)="logout()">Logout</button>
 
-    <div *ngIf="summary" class="summary-box">
-      <h3>AI Summary</h3>
-      <p>{{ summary }}</p>
-    </div>
   </div>
 </div>

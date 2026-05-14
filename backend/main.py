@@ -144,15 +144,25 @@ def summarize_notes(
     notes_text = "\n".join([f"- {note.title}" for note in notes])
 
     prompt = f"""
-Summarize the following user notes clearly and concisely.
+Summarize the following notes in a clean, readable format.
 
 Notes:
 {notes_text}
 
-Return:
-- A short summary
-- Key themes
-- Suggested next actions
+Format the response exactly like this:
+
+Summary:
+[2-3 sentence summary]
+
+Key Themes:
+- [theme 1]
+- [theme 2]
+- [theme 3]
+
+Suggested Next Actions:
+- [action 1]
+- [action 2]
+- [action 3]
 """
 
     try:
