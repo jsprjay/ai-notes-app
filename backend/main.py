@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, Session, relationship
 from datetime import datetime, timedelta, timezone
+import requests
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -134,30 +135,46 @@ USE_AI = False # toggle this to use AI feature
 def summarize_notes(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
-    ):
-    
+):
     notes = db.query(Note).filter(Note.user_id == current_user.id).all()
 
     if not notes:
         return {"summary": "No notes to summarize."}
 
-    text = "\n".join([str(note.title) for note in notes])
+    notes_text = "\n".join([f"- {note.title}" for note in notes])
 
-    if not USE_AI:
+    prompt = f"""
+Summarize the following user notes clearly and concisely.
+
+Notes:
+{notes_text}
+
+Return:
+- A short summary
+- Key themes
+- Suggested next actions
+"""
+
+    try:
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "llama3.2",
+                "prompt": prompt,
+                "stream": False
+            },
+            timeout=60
+        )
+
+        response.raise_for_status()
+        data = response.json()
+
+        return {"summary": data.get("response", "No summary generated.")}
+
+    except requests.exceptions.RequestException:
         return {
-            "summary": f"Mock summary: You have {len(notes)} notes. Topics include {', '.join([str(n.title) for n in notes[:3]])}."
+            "summary": "Ollama is not running or the model is unavailable. Please start Ollama and try again."
         }
-
-    # REAL AI (only runs if USE_AI = True)
-    response = client.chat.completions.create(
-        model="gpt-4.1",
-        messages=[
-            {"role": "system", "content": "Summarize notes clearly."},
-            {"role": "user", "content": text}
-        ]
-    )
-
-    return {"summary": response.choices[0].message.content}
 
 @app.get("/")
 def home():
