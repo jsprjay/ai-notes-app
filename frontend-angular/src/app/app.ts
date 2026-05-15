@@ -3,6 +3,15 @@ import { FormsModule } from '@angular/forms';
 import { NotesService, Note } from './notes.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './auth.service';
+import { Observable } from 'rxjs';
+
+interface RequestConfig<T> {
+  request: Observable<T>;
+  onSuccess: (response: T) => void;
+  errorMessage: string;
+  beforeRequest?: () => void;
+  afterRequest?: () => void;
+}
 
 @Component({
   selector: 'app-root',
@@ -34,6 +43,33 @@ export class App implements OnInit {
   searchTerm = '';
   sortOption = 'newest';
 
+  private clearError(): void {
+    this.error = '';
+  }
+
+  private setError(message: string): void {
+    this.error = message;
+  }
+
+  private runRequest<T>(config: RequestConfig<T>): void {
+    this.clearError();
+    config.beforeRequest?.();
+
+    config.request.subscribe({
+      next: (response) => {
+        config.onSuccess(response);
+        config.afterRequest?.();
+        this.clearError();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        config.afterRequest?.();
+        this.setError(config.errorMessage);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   constructor(
     private notesService: NotesService,
     private cdr: ChangeDetectorRef,
@@ -51,9 +87,11 @@ export class App implements OnInit {
   }
 
   get filteredNotes(): Note[] {
-    let filtered = this.notes.filter(note =>
-      note.title.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+    let filtered = this.notes
+      .filter(note =>
+        note.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      )
+      .slice();
 
     if (this.sortOption === 'az') {
       filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
@@ -88,10 +126,13 @@ export class App implements OnInit {
           this.authService.saveToken(res.access_token);
           this.email = '';
           this.password = '';
+          this.authError = '';
           this.loadNotes();
+          this.cdr.detectChanges();
         },
         error: () => {
           this.authError = 'Invalid email or password.';
+          this.cdr.detectChanges();
         }
       });
     } else {
@@ -99,9 +140,11 @@ export class App implements OnInit {
         next: () => {
           this.isLoginMode = true;
           this.authError = 'Account created. You can now log in.';
+          this.cdr.detectChanges();
         },
         error: () => {
           this.authError = 'Could not create account.';
+          this.cdr.detectChanges();
         }
       });
     }
@@ -111,21 +154,27 @@ export class App implements OnInit {
     this.authService.logout();
     this.notes = [];
     this.summary = '';
+    this.error = '';
+    this.authError = '';
+    this.noteTitle = '';
+    this.editingNoteId = null;
+    this.editedTitle = '';
+    this.cdr.detectChanges();
   }
 
   loadNotes(): void {
-    this.isLoading = true;
-    this.error = '';
-
-    this.notesService.getNotes().subscribe({
-      next: (data) => {
-        this.notes = data;
+    this.runRequest({
+      request: this.notesService.getNotes(),
+      beforeRequest: () => {
+        this.isLoading = true;
+      },
+      afterRequest: () => {
         this.isLoading = false;
       },
-      error: () => {
-        this.error = 'Could not load notes. Please check if the backend is running.';
-        this.isLoading = false;
-      }
+      onSuccess: (data) => {
+        this.notes = data;
+      },
+      errorMessage: 'Could not load notes. Please check if the backend is running.'
     });
   }
 
@@ -133,94 +182,94 @@ export class App implements OnInit {
     const title = this.noteTitle.trim();
 
     if (!title) {
-      this.error = 'Note cannot be empty.';
+      this.setError('Note cannot be empty.');
+      this.cdr.detectChanges();
       return;
     }
 
-    this.isSaving = true;
-    this.error = '';
-
-    this.notesService.addNote(title).subscribe({
-      next: () => {
-        this.noteTitle = '';
+    this.runRequest({
+      request: this.notesService.addNote(title),
+      beforeRequest: () => {
+        this.isSaving = true;
+      },
+      afterRequest: () => {
         this.isSaving = false;
+      },
+      onSuccess: () => {
+        this.noteTitle = '';
         this.loadNotes();
       },
-      error: () => {
-        this.error = 'Could not add note. Please try again.';
-        this.isSaving = false;
-      }
+      errorMessage: 'Could not add note. Please try again.'
     });
   }
 
   deleteNote(id: number): void {
-    this.isDeletingId = id;
-    this.error = '';
-
-    this.notesService.deleteNote(id).subscribe({
-      next: () => {
+    this.runRequest({
+      request: this.notesService.deleteNote(id),
+      beforeRequest: () => {
+        this.isDeletingId = id;
+      },
+      afterRequest: () => {
         this.isDeletingId = null;
+      },
+      onSuccess: () => {
         this.loadNotes();
       },
-      error: () => {
-        this.error = 'Could not delete note. Please try again.';
-        this.isDeletingId = null;
-      }
+      errorMessage: 'Could not delete note. Please try again.'
     });
   }
 
   startEditing(note: Note): void {
     this.editingNoteId = note.id;
     this.editedTitle = note.title;
+    this.clearError();
   }
 
   cancelEditing(): void {
     this.editingNoteId = null;
     this.editedTitle = '';
+    this.clearError();
   }
 
   saveEdit(id: number): void {
     const title = this.editedTitle.trim();
 
     if (!title) {
-      this.error = 'Note cannot be empty.';
+      this.setError('Note cannot be empty.');
+      this.cdr.detectChanges();
       return;
     }
 
-    this.isSaving = true;
-    this.error = '';
-
-    this.notesService.updateNote(id, title).subscribe({
-      next: () => {
+    this.runRequest({
+      request: this.notesService.updateNote(id, title),
+      beforeRequest: () => {
+        this.isSaving = true;
+      },
+      afterRequest: () => {
+        this.isSaving = false;
+      },
+      onSuccess: () => {
         this.editingNoteId = null;
         this.editedTitle = '';
-        this.isSaving = false;
         this.loadNotes();
       },
-      error: () => {
-        this.error = 'Could not update note. Please try again.';
-        this.isSaving = false;
-      }
+      errorMessage: 'Could not update note. Please try again.'
     });
   }
 
   getSummary(): void {
-    this.isSummarizing = true;
-    this.error = '';
-
-    this.notesService.getSummary().subscribe({
-      next: (res) => {
-        this.summary = res.summary;
-        this.isSummarizing = false;
-
-        this.cdr.detectChanges();
+    this.runRequest({
+      request: this.notesService.getSummary(),
+      beforeRequest: () => {
+        this.isSummarizing = true;
       },
-      error: () => {
-        this.error = 'Could not generate summary.';
+      afterRequest: () => {
         this.isSummarizing = false;
-
-        this.cdr.detectChanges();
-      }
+      },
+      onSuccess: (res) => {
+        this.summary = res.summary;
+      },
+      errorMessage: 'Could not generate summary.'
     });
   }
 }
