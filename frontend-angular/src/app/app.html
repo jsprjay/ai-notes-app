@@ -1,80 +1,47 @@
-<div class="container">
-  <h1>Notes App</h1>
+<main class="app-shell">
+  <section class="container">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Personal workspace</p>
+        <h1>Notes App</h1>
+      </div>
 
-  <div *ngIf="!isLoggedIn" class="auth-card">
-    <h2>{{ isLoginMode ? 'Login' : 'Create Account' }}</h2>
+      <button *ngIf="isLoggedIn" class="ghost-btn" (click)="logout()">Logout</button>
+    </header>
 
-    <input [(ngModel)]="email" placeholder="Email" />
-    <input [(ngModel)]="password" placeholder="Password" type="password" />
+    <div *ngIf="!isLoggedIn" class="auth-card">
+      <h2>{{ isLoginMode ? 'Login' : 'Create Account' }}</h2>
 
-    <button (click)="handleAuth()">
-      {{ isLoginMode ? 'Login' : 'Register' }}
-    </button>
+      <div class="field-stack">
+        <input [(ngModel)]="email" placeholder="Email" />
+        <input [(ngModel)]="password" placeholder="Password" type="password" />
+      </div>
 
-    <p class="error" *ngIf="authError">{{ authError }}</p>
+      <button class="primary-btn" (click)="handleAuth()">
+        {{ isLoginMode ? 'Login' : 'Register' }}
+      </button>
 
-    <button class="link-btn" (click)="isLoginMode = !isLoginMode">
-      {{ isLoginMode ? 'Need an account? Register' : 'Already have an account? Login' }}
-    </button>
-  </div>
+      <p class="error" *ngIf="authError">{{ authError }}</p>
 
-  <div *ngIf="isLoggedIn">
-    
-    <div class="form-row">
-      <input
-        [(ngModel)]="noteTitle"
-        placeholder="Enter note"
-        (keyup.enter)="addNote()"
-      />
-
-      <button (click)="addNote()">Add Note</button>
+      <button class="link-btn" (click)="isLoginMode = !isLoginMode">
+        {{ isLoginMode ? 'Need an account? Register' : 'Already have an account? Login' }}
+      </button>
     </div>
 
-    <p class="error" *ngIf="error">{{ error }}</p>
+    <div *ngIf="isLoggedIn" class="workspace">
+      <section class="composer-panel">
+        <div class="form-row">
+          <input
+            [(ngModel)]="noteTitle"
+            placeholder="Enter note"
+            (keyup.enter)="addNote()"
+          />
 
-    <p class="empty-state" *ngIf="!isLoading && filteredNotes.length === 0">
-      No notes match your search.
-    </p>
+          <button class="primary-btn" (click)="addNote()">Add Note</button>
+        </div>
 
-    <div class="filter-row">
-      <input
-        [(ngModel)]="searchTerm"
-        placeholder="Search notes..."
-      />
-
-      <select [(ngModel)]="sortOption">
-        <option value="newest">Newest</option>
-        <option value="oldest">Oldest</option>
-        <option value="az">A-Z</option>
-        <option value="za">Z-A</option>
-      </select>
-    </div>
-
-    <select [(ngModel)]="noteCategory">
-      <option value="General">General</option>
-      <option value="Work">Work</option>
-      <option value="Personal">Personal</option>
-      <option value="Learning">Learning</option>
-      <option value="Ideas">Ideas</option>
-    </select>
-
-    <select [(ngModel)]="categoryFilter">
-      <option value="all">All Categories</option>
-      <option *ngFor="let category of categories" [value]="category">
-        {{ category }}
-      </option>
-    </select>
-
-<input
-  [(ngModel)]="noteTags"
-  placeholder="Tags, comma separated"
-/>
-
-    <ul>
-      <li *ngFor="let note of filteredNotes">
-        <ng-container *ngIf="editingNoteId === note.id; else viewMode">
-          <input [(ngModel)]="editedTitle" />
-          <select [(ngModel)]="editedCategory">
+        <div class="metadata-grid">
+          <select [(ngModel)]="noteCategory">
             <option value="General">General</option>
             <option value="Work">Work</option>
             <option value="Personal">Personal</option>
@@ -82,60 +49,106 @@
             <option value="Ideas">Ideas</option>
           </select>
 
-          <input [(ngModel)]="editedTags" placeholder="Tags, comma separated" />
-          <button (click)="saveEdit(note.id)">Save</button>
-          <button (click)="cancelEditing()">Cancel</button>
-        </ng-container>
+          <input [(ngModel)]="noteTags" placeholder="Tags, comma separated" />
+        </div>
+      </section>
 
-        <ng-template #viewMode>
-          <span>{{ note.title }}</span>
-          <div>
-            <span class="category-badge">{{ note.category }}</span>
-            <div class="tags" *ngIf="note.tags">
-              <span class="tag" *ngFor="let tag of note.tags.split(',')">
-                #{{ tag.trim() }}
-              </span>
+      <p class="error" *ngIf="error">{{ error }}</p>
+
+      <section class="toolbar-panel">
+        <div class="filter-row">
+          <input [(ngModel)]="searchTerm" placeholder="Search notes..." />
+
+          <select [(ngModel)]="sortOption">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="az">A-Z</option>
+            <option value="za">Z-A</option>
+          </select>
+
+          <select [(ngModel)]="categoryFilter">
+            <option value="all">All Categories</option>
+            <option *ngFor="let category of categories" [value]="category">
+              {{ category }}
+            </option>
+          </select>
+        </div>
+      </section>
+
+      <p class="empty-state" *ngIf="!isLoading && filteredNotes.length === 0">
+        No notes match your search.
+      </p>
+
+      <ul class="notes-list">
+        <li *ngFor="let note of filteredNotes">
+          <ng-container *ngIf="editingNoteId === note.id; else viewMode">
+            <div class="edit-grid">
+              <input [(ngModel)]="editedTitle" />
+              <select [(ngModel)]="editedCategory">
+                <option value="General">General</option>
+                <option value="Work">Work</option>
+                <option value="Personal">Personal</option>
+                <option value="Learning">Learning</option>
+                <option value="Ideas">Ideas</option>
+              </select>
+              <input [(ngModel)]="editedTags" placeholder="Tags, comma separated" />
             </div>
-            <button (click)="startEditing(note)" [disabled]="isDeletingId === note.id">
-              Edit
-            </button>
 
-            <button
-              class="delete-btn"
-              (click)="deleteNote(note.id)"
-              [disabled]="isDeletingId === note.id"
-            >
-              {{ isDeletingId === note.id ? 'Deleting...' : 'Delete' }}
-            </button>
-          </div>
-        </ng-template>
-      </li>
-    </ul>
+            <div class="note-actions">
+              <button class="primary-btn" (click)="saveEdit(note.id)">Save</button>
+              <button class="ghost-btn" (click)="cancelEditing()">Cancel</button>
+            </div>
+          </ng-container>
 
-    <div class="summary-section">
-      <button
-        class="summary-btn"
-        (click)="getSummary()"
-        [disabled]="isSummarizing"
-      >
-        {{ isSummarizing ? 'Generating summary...' : 'Summarize Notes' }}
-      </button>
+          <ng-template #viewMode>
+            <div class="note-content">
+              <span class="note-title">{{ note.title }}</span>
+              <div class="note-meta">
+                <span class="category-badge">{{ note.category }}</span>
+                <div class="tags" *ngIf="note.tags">
+                  <span class="tag" *ngFor="let tag of note.tags.split(',')">
+                    #{{ tag.trim() }}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-      <div *ngIf="isSummarizing" class="summary-loading">
-        <div class="spinner"></div>
-        <span>Ollama is thinking...</span>
-      </div>
+            <div class="note-actions">
+              <button class="ghost-btn" (click)="startEditing(note)" [disabled]="isDeletingId === note.id">
+                Edit
+              </button>
 
-      <div *ngIf="summary && !isSummarizing" class="summary-card">
-        <div class="summary-header">
-          <h3>AI Summary</h3>
-          <span class="summary-badge">Ollama</span>
+              <button
+                class="delete-btn"
+                (click)="deleteNote(note.id)"
+                [disabled]="isDeletingId === note.id"
+              >
+                {{ isDeletingId === note.id ? 'Deleting...' : 'Delete' }}
+              </button>
+            </div>
+          </ng-template>
+        </li>
+      </ul>
+
+      <section class="summary-section">
+        <button class="summary-btn" (click)="getSummary()" [disabled]="isSummarizing">
+          {{ isSummarizing ? 'Generating summary...' : 'Summarize Notes' }}
+        </button>
+
+        <div *ngIf="isSummarizing" class="summary-loading">
+          <div class="spinner"></div>
+          <span>Ollama is thinking...</span>
         </div>
 
-        <p class="summary-text">{{ summary }}</p>
-      </div>
-    </div>
-    <button (click)="logout()">Logout</button>
+        <div *ngIf="summary && !isSummarizing" class="summary-card">
+          <div class="summary-header">
+            <h3>AI Summary</h3>
+            <span class="summary-badge">Ollama</span>
+          </div>
 
-  </div>
-</div>
+          <p class="summary-text">{{ summary }}</p>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
