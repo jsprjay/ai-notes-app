@@ -43,6 +43,14 @@ export class App implements OnInit {
   searchTerm = '';
   sortOption = 'newest';
 
+  noteCategory = 'General';
+  noteTags = '';
+
+  editedCategory = 'General';
+  editedTags = '';
+
+  categoryFilter = 'all';
+
   private clearError(): void {
     this.error = '';
   }
@@ -86,12 +94,21 @@ export class App implements OnInit {
     return this.authService.isLoggedIn();
   }
 
+  get categories(): string[] {
+    return [...new Set(this.notes.map(note => note.category || 'General'))];
+  }
+
   get filteredNotes(): Note[] {
     let filtered = this.notes
-      .filter(note =>
-        note.title.toLowerCase().includes(this.searchTerm.toLowerCase())
-      )
-      .slice();
+    .filter(note =>
+      note.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      note.category.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      note.tags.toLowerCase().includes(this.searchTerm.toLowerCase())
+    )
+    .filter(note =>
+      this.categoryFilter === 'all' || note.category === this.categoryFilter
+    )
+    .slice();
 
     if (this.sortOption === 'az') {
       filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
@@ -188,7 +205,7 @@ export class App implements OnInit {
     }
 
     this.runRequest({
-      request: this.notesService.addNote(title),
+      request: this.notesService.addNote(title, this.noteCategory, this.noteTags),
       beforeRequest: () => {
         this.isSaving = true;
       },
@@ -197,6 +214,8 @@ export class App implements OnInit {
       },
       onSuccess: () => {
         this.noteTitle = '';
+        this.noteCategory = 'General';
+        this.noteTags = '';
         this.loadNotes();
       },
       errorMessage: 'Could not add note. Please try again.'
@@ -222,6 +241,8 @@ export class App implements OnInit {
   startEditing(note: Note): void {
     this.editingNoteId = note.id;
     this.editedTitle = note.title;
+    this.editedCategory = note.category;
+    this.editedTags = note.tags;
     this.clearError();
   }
 
@@ -241,7 +262,7 @@ export class App implements OnInit {
     }
 
     this.runRequest({
-      request: this.notesService.updateNote(id, title),
+      request: this.notesService.updateNote(id, title, this.editedCategory, this.editedTags),
       beforeRequest: () => {
         this.isSaving = true;
       },

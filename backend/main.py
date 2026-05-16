@@ -1,6 +1,3 @@
-import os
-from openai import OpenAI
-from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Depends, HTTPException, Header
 from passlib.context import CryptContext
@@ -11,8 +8,6 @@ from sqlalchemy.orm import sessionmaker, declarative_base, Session, relationship
 from datetime import datetime, timedelta, timezone
 import requests
 
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # FastAPI app initialization
 app = FastAPI()
@@ -31,7 +26,7 @@ app.add_middleware(
 )
 
 # Auth setup
-SECRET_KEY = "change-this-secret-key-later"
+SECRET_KEY = "change-this-secret-key-later"  # Move to .env before production use
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
@@ -61,9 +56,13 @@ class User(Base):
 
 class Note(Base):
     __tablename__ = "notes"
+
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
+    category = Column(String, default="General")
+    tags = Column(String, default="")
     user_id = Column(Integer, ForeignKey("users.id"))
+
     owner = relationship("User", back_populates="notes")
 
 Base.metadata.create_all(bind=engine)
@@ -78,6 +77,8 @@ class UserLogin(BaseModel):
 
 class NoteCreate(BaseModel):
     title: str
+    category: str = "General"
+    tags: str = ""
 
 def get_db():
     db = SessionLocal()
@@ -128,7 +129,7 @@ def get_current_user(
 
     return user
 
-USE_AI = False # toggle this to use AI feature
+USE_OLLAMA = True  # Toggle local Ollama summarization on/off
 
 # summarizer route
 @app.get("/notes/summary")
@@ -141,7 +142,10 @@ def summarize_notes(
     if not notes:
         return {"summary": "No notes to summarize."}
 
-    notes_text = "\n".join([f"- {note.title}" for note in notes])
+    notes_text = "\n".join([
+        f"- Title: {note.title}, Category: {note.category}, Tags: {note.tags or 'None'}"
+        for note in notes
+    ])
 
     prompt = f"""
 Summarize the following notes in a clean, readable format.
@@ -164,6 +168,14 @@ Suggested Next Actions:
 - [action 2]
 - [action 3]
 """
+
+    if not USE_OLLAMA:
+        return {
+            "summary": (
+                f"Mock summary: You have {len(notes)} notes. "
+                f"Topics include {', '.join(str(note.title) for note in notes[:3])}."
+            )
+        }
 
     try:
         response = requests.post(
@@ -205,7 +217,12 @@ def create_note(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    new_note = Note(title=note.title, user_id=current_user.id)
+    new_note = Note(
+        title=note.title,
+        category=note.category,
+        tags=note.tags,
+        user_id=current_user.id
+    )
 
     db.add(new_note)
     db.commit()
@@ -228,7 +245,7 @@ def update_note(
     if note is None:
         raise HTTPException(status_code=404, detail="Note not found")
 
-    for key, value in updated_note.dict().items():
+    for key, value in updated_note.model_dump().items():
         setattr(note, key, value)
     db.commit()
     db.refresh(note)

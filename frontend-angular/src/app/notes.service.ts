@@ -6,6 +6,8 @@ import { AuthService } from './auth.service';
 export interface Note {
   id: number;
   title: string;
+  category: string;
+  tags: string;
 }
 
 @Injectable({
@@ -33,18 +35,18 @@ export class NotesService {
     });
   }
 
-  addNote(title: string): Observable<Note> {
+  addNote(title: string, category: string, tags: string): Observable<Note> {
     return this.http.post<Note>(
       this.apiUrl,
-      { title },
+      { title, category, tags },
       { headers: this.getHeaders() }
     );
   }
 
-  updateNote(id: number, title: string): Observable<Note> {
+  updateNote(id: number, title: string, category: string, tags: string): Observable<Note> {
     return this.http.put<Note>(
       `${this.apiUrl}/${id}`,
-      { title },
+      { title, category, tags },
       { headers: this.getHeaders() }
     );
   }

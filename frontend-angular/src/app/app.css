@@ -185,6 +185,32 @@ input:disabled {
   white-space: pre-line;
 }
 
+.category-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 4px 8px;
+  background: #e0f2fe;
+  color: #075985;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tags {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

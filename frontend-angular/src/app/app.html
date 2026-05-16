@@ -50,19 +50,52 @@
       </select>
     </div>
 
+    <select [(ngModel)]="noteCategory">
+      <option value="General">General</option>
+      <option value="Work">Work</option>
+      <option value="Personal">Personal</option>
+      <option value="Learning">Learning</option>
+      <option value="Ideas">Ideas</option>
+    </select>
+
+    <select [(ngModel)]="categoryFilter">
+      <option value="all">All Categories</option>
+      <option *ngFor="let category of categories" [value]="category">
+        {{ category }}
+      </option>
+    </select>
+
+<input
+  [(ngModel)]="noteTags"
+  placeholder="Tags, comma separated"
+/>
+
     <ul>
       <li *ngFor="let note of filteredNotes">
         <ng-container *ngIf="editingNoteId === note.id; else viewMode">
           <input [(ngModel)]="editedTitle" />
+          <select [(ngModel)]="editedCategory">
+            <option value="General">General</option>
+            <option value="Work">Work</option>
+            <option value="Personal">Personal</option>
+            <option value="Learning">Learning</option>
+            <option value="Ideas">Ideas</option>
+          </select>
 
+          <input [(ngModel)]="editedTags" placeholder="Tags, comma separated" />
           <button (click)="saveEdit(note.id)">Save</button>
           <button (click)="cancelEditing()">Cancel</button>
         </ng-container>
 
         <ng-template #viewMode>
           <span>{{ note.title }}</span>
-
           <div>
+            <span class="category-badge">{{ note.category }}</span>
+            <div class="tags" *ngIf="note.tags">
+              <span class="tag" *ngFor="let tag of note.tags.split(',')">
+                #{{ tag.trim() }}
+              </span>
+            </div>
             <button (click)="startEditing(note)" [disabled]="isDeletingId === note.id">
               Edit
             </button>
